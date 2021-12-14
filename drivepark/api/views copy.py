@@ -59,24 +59,57 @@ class DriversList(generics.ListCreateAPIView):
     filterset_class = DrvFilter
 
     # @api_view(['GET','POST'])
+    def get_queryset(self):
+        '''Allow us to create a driver and get drivers list'''
+
+        if self.request.method == 'GET': #list
+            drivers = Driver.objects.all() 
+            serializer = DriverSerializer(drivers, many=True)
+            return  drivers
+
+        elif self.request.method == 'POST':  #create
+            serializer = DriverSerializer(data=self.request.data)
+            if serializer.is_valid():
+                serializer.save()
+            return serializer.data
+
     # def get_queryset(self):
-    #     '''Allow us to create a driver and get drivers list'''
-        # if self.request.method == 'GET': #list
-        #     drivers = Driver.objects.all() 
-        #     serializer = DriverSerializer(drivers, many=True)
-        #     return  drivers
-        # if self.request.method == 'POST':  #create
-        #     serializer = DriverSerializer(data=self.request.data)
-        #     if serializer.is_valid():
-        #         serializer.save()
-        #     return serializer.data
+    #     """
+    #     Optionally res
+    #     """
+    #     queryset = Driver.objects.all()
+    #     # filter_prop = self.request.query_params.get('created_at__gte')
+    #     filter_prop = self.request.query_params.get('created_at__gte')
+    #     print("LALALALLALA",filter_prop)
+        
+
+    #     if filter_prop is not None:
+    #         urllDate = datetime.strptime(filter_prop, '%d-%m-%Y')
+    #         urllDate = urllDate.date()
+    #         # drivers = drivers.filter(created_at = urllDate)
+    #         drivers = queryset.filter(created_at__gte = urllDate)
+    #     return drivers
+        
+        # elif filter_prop is not None:
+        #     # drivers = drivers.filter(created_at = urllDate)
+        #     drivers = self.drivers.filter(created_at__gte = urllDate)
+        #     return drivers    
+
+
+
+
+
+    # param = request.GET.get('created_at__gte',none)
+    # if param:
+    #     drivers = Driver.objects.all()
+    #     serializer = DriverSerializer(drivers, many=True)
+    #     f = StartFilter(request.GET, drivers)
+    #     render(request, 'my_app/template.html', {'filter': f})
 
 
 @api_view(['POST','GET','DELETE'])
 def driverUpDelDet(request, pk): 
-    '''
-    Allows update/delete and show detail
-    '''
+    '''Allows update/delete and show detail'''
     if request.method == 'GET': # driver detail
         driver = Driver.objects.get(id=pk) 
         serializer = DriverSerializer(driver, many=False)
@@ -95,11 +128,6 @@ def driverUpDelDet(request, pk):
         return Response("Succsesfully deleted")
 
 # Vehicle views
-
-# /vehicles/vehicle/?with_drivers=yes 
-
-
-
 @api_view(['GET','POST'])
 def vehicleTool(request): 
     '''Allow us to create vehicle and get vehicles list'''
