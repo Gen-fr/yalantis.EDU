@@ -43,38 +43,42 @@ def apiOverview(request):
     }
     return Response(api_urls) 
 
-# class DrvFilter(filters.FilterSet):
-#     created_at__gte = filters.NumberFilter(field_name='created_at__gte', lookup_expr='gte')
+class DrvFilter(filters.FilterSet):
+    created_at__gte = filters.DateFilter(field_name="created_at", lookup_expr='gte')
+    created_at__lte = filters.DateFilter(field_name="created_at", lookup_expr='lte')
 
-#     class Meta:
-#         model = Driver
-#         fields = {
-#             'created_at': ['lte', 'gte'],
-#         }
+    class Meta:
+        model = Driver
+        fields = { 'created_at': ['gte','lte'],}
 
 class DriversList(generics.ListAPIView):
- 
-    drivers = Driver.objects.all()
+    queryset = Driver.objects.all()
+    filter_backends = (filters.DjangoFilterBackend,)
     serializer_class = DriverSerializer
-    # filter_backends = (filters.DjangoFilterBackend,)
+    filterset_class = DrvFilter
 
-    def get_queryset(self):
-        """
-        Optionally restricts the returned purchases to a given user,
-        by filtering against a `username` query parameter in the URL.
-        """
-        # drivers = Driver.objects.all()
-        filter_prop = self.request.query_params.get('created_at__gte')
-        urllDate = datetime.strptime(filter_prop, '%d-%m-%Y')
-        urllDate = urllDate.date()
 
-        print('HEEEEEEEER1111')
-        print(urllDate,filter_prop)
-        # if filter_prop is not None:
-            # drivers = drivers.filter(created_at = urllDate)
-        drivers = self.drivers.filter(created_at__gte = urllDate)
+    # def get_queryset(self):
+    #     """
+    #     Optionally res
+    #     """
+    #     queryset = Driver.objects.all()
+    #     # filter_prop = self.request.query_params.get('created_at__gte')
+    #     filter_prop = self.request.query_params.get('created_at__gte')
+    #     print("LALALALLALA",filter_prop)
+        
 
-        return drivers
+    #     if filter_prop is not None:
+    #         urllDate = datetime.strptime(filter_prop, '%d-%m-%Y')
+    #         urllDate = urllDate.date()
+    #         # drivers = drivers.filter(created_at = urllDate)
+    #         drivers = queryset.filter(created_at__gte = urllDate)
+    #     return drivers
+        
+        # elif filter_prop is not None:
+        #     # drivers = drivers.filter(created_at = urllDate)
+        #     drivers = self.drivers.filter(created_at__gte = urllDate)
+        #     return drivers    
 
 
 
@@ -171,23 +175,4 @@ def vehicleUpDelDet(request, pk):
 
 
 
-# class DriversList(generics.ListAPIView):
-#     filter_fields = {
-#         'created_at': ['gte', 'lte']
-#     }
-#     serializer_class = DriverSerializer
-#     #serializer_class = FilterSerializer
-#     def get_queryset(self):
-#         """
-#         Optionally restricts the returned purchases to a given user,
-#         by filtering against a `username` query parameter in the URL.
-#         """
-#         drivers = Driver.objects.all()
-#         filter_prop = self.request.query_params.get('created_at__gte')
-#         urllDate = datetime.strptime(filter_prop, '%d-%m-%Y')
 
-#         print('HEEEEEEEER1111')
-#         print(urllDate,filter_prop)
-#         if filter_prop is not None:
-#             drivers = drivers.filter(created_at = urllDate)
-#         return drivers
