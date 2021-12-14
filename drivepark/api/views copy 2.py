@@ -1,8 +1,7 @@
 from datetime import datetime
-from django.shortcuts import get_object_or_404
 from django_filters import rest_framework as filters
   
-from rest_framework import generics, viewsets
+from rest_framework import generics
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
@@ -96,13 +95,22 @@ def driverUpDelDet(request, pk):
         return Response("Succsesfully deleted")
 
 # Vehicle views
+
+# /vehicles/vehicle/?with_drivers=yes 
+
 class VehicleFilter(filters.FilterSet):
+    # uncategorized = NumberInFilter(field_name='driver_id', lookup_expr='in')      
     driver_id = filters.NumberFilter(field_name="driver_id", lookup_expr='isnull', )
+#  exclude=False
     class Meta:
         model = Vehicle
         fields = ['driver_id']
+        # ['driver_id']
+        # { 'driver_id': ['gte','lte'],}
+
 
 class VehicleList(generics.ListCreateAPIView):
+    # queryset = Vehicle.objects.all()
     filter_backends = (filters.DjangoFilterBackend,)
     serializer_class = VehicleSerializer
     filterset_class = VehicleFilter
@@ -116,6 +124,7 @@ class VehicleList(generics.ListCreateAPIView):
         driver_chk = self.request.query_params.get('with_drivers')
         print(driver_chk)
         if driver_chk == "no":
+            print("ohEEEEE TRUUUUUE")
             queryset = queryset.filter(driver_id=None)
         if driver_chk == "yes":
             queryset = queryset.filter(driver_id__gt = 0)
@@ -123,20 +132,24 @@ class VehicleList(generics.ListCreateAPIView):
 
 
 
-class VehicleSet(generics.ListCreateAPIView):
-    ''' 
 
-    '''
-    queryset = Vehicle.objects.all()
-    serializer_class = VehicleSerializer
-    lookup_url_kwarg = "pk"
 
-    def get_object(self):
-        def get_queryset(self):
-            pk = self.kwargs.get(self.lookup_url_kwarg)
-            theV = Vehicle.objects.filter(driver_ia=pk)
-            return theV
 
+
+# @api_view(['GET','POST'])
+# def vehicleTool(request): 
+#     '''Allow us to create vehicle and get vehicles list'''
+    
+#     if request.method == 'GET': #list
+#         vehicles = Vehicle.objects.all() 
+#         serializer = VehicleSerializer(vehicles, many=True)
+#         return Response(serializer.data)
+        
+#     elif request.method == 'POST':  #create
+#         serializer = VehicleSerializer(data=request.data)
+#         if serializer.is_valid():
+#             serializer.save()
+#         return Response(serializer.data)
 
 
 @api_view(['POST','GET','DELETE'])
@@ -160,21 +173,9 @@ def vehicleUpDelDet(request, pk):
         vehicle.delete()
         return Response("Vehicle is succsesfully deleted")
 
-# + POST /vehicles/set_driver/<vehicle_id>/ - садимо водія в машину / висаджуємо водія з машини  
-@api_view(['POST','GET'])
-def vehicleSetDriver(request, pk):
-    '''Set driver'''
-    if request.method == 'GET': # vehicle detail
-        vehicle = Vehicle.objects.get(id=pk) 
-        serializer = VehicleSerializer(vehicle, many=False)
-        return Response(serializer.data)
 
-    if request.method == 'POST': # update
-        vehicle = Vehicle.objects.get(id=pk)
-        serializer = VehicleSerializer(instance=vehicle,  data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-        return Response(serializer.data)
+
+
 
 
 

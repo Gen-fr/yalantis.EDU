@@ -41,7 +41,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'django_filters',
 #my apps
-    'api.apps.ApiConfig'
+    'api.apps.ApiConfig',
 
 ]
 
@@ -135,5 +135,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 #MY SETS
 REST_FRAMEWORK = {
 
-    'DATETIME_FORMAT': "%d-%m-%YT%H:%M:%S.%fZ",
+    'DATETIME_FORMAT': "%d-%m-%Y %H:%M:%S",
 }
